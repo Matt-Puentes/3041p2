@@ -6,8 +6,8 @@ var progressBarPos = 0;
 var data;
 var notesPlayed = [];
 function preload() {
-    song = loadSound('Note-Nice.wav');
-    mySound.playMode('restart');
+    song = loadSound('Note-Annoying.wav');
+    song.playMode('restart');
     //song = loadSound('Note-Nice.wav');
 }
 
@@ -28,16 +28,16 @@ function draw() {
     var pixelsPerSecond = (width/data.length)/1
     var yRange = [-13,1];
     progressBarPos += pixelsPerSecond * dt
-    if(titleState < 100)
-        titleState--;
     if(titleState > 0){
+        if(titleState != 100)
+            titleState--;
         background("#9055A2");
         textAlign(CENTER);
         fill(46, 41, 78, (titleState/100) * 255);
         text("Has music been getting louder? Let's see...", width/2, 60);
         progressBarPos = 0
     }
-    else {
+    else if(titleState == 0){
         background("#D499B9")
         textAlign(CENTER);
         fill("#011638");
@@ -53,6 +53,16 @@ function draw() {
             console.log(volume)
             song.play(0,1, volume ,0,2);
         }
+        if(progressBarPos > width){
+            titleState = -1;
+        }
+    } else {
+        titleState -= 1;
+        background("#9055A2");
+        textAlign(CENTER);
+        fill(46, 41, 78, (titleState/-100) * 255);
+        text("See how terrible music has become?\nYou can help by texting 1-800-STOPPOP.", width/2, 60);
+        progressBarPos = 0
     }
     lastDraw = millis();
 }
