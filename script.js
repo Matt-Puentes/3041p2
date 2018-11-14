@@ -9,8 +9,9 @@ var notesPlayed = [];
 var yRange = [-13,1];
 
 function preload() {
-    song = loadSound('Note-Annoying.wav');
-    //song = loadSound('Note-Nice.wav');
+    // song = loadSound('Note-Annoying.wav');
+    song = loadSound('237.mp3');
+    // song = loadSound('Note-Nice.wav');
     song.playMode('restart');
 }
 
@@ -20,7 +21,6 @@ function setup() {
     textSize(40);
     textAlign(CENTER);
     data = getData();
-
 }
 
 function mousePressed() {
@@ -68,7 +68,11 @@ function draw() {
             notesPlayed.push(currPoint);
             //Calculate volume based on data
             var volume = ((data[currPoint]["Max Loud"] - yRange[0])/(yRange[1] - yRange[0]));
-            song.play(0,1, volume ,0,2);
+            if(currPoint == 0)
+                song.play(0,1,1,30,100);
+            var masterVol = ((Math.pow(100,(currPoint/data.length))-1)/75)+.20
+            print(masterVol)
+            masterVolume(masterVol)
         }
         if(progressBarPos > width){
             demoState = 2;
