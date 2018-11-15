@@ -43,6 +43,7 @@ function mousePressed() {
 }
 
 function draw() {
+    textSize(40)
     //This handles the timing for the progress bar
     if(demoState == 1){
         var dt = (millis() - lastDraw)/1000;
@@ -74,7 +75,7 @@ function draw() {
         background(pink);
         textAlign(CENTER);
         fill(0, 50, 135);
-        text("Let's look at the volume of music over 84 years...", width/2, 50);
+        text("Let's look at the volume of music over 84 years...", width/2, 30);
 
         //Draw Line Graph
         lineGraph(-13, 1, "Max Loud",data);
@@ -140,6 +141,38 @@ function lineGraph(minY, maxY, yKey, points){
     }
     line(graphXpadding, graphHeight + graphYpadding, width - graphXpadding, graphHeight + graphYpadding)
     line(0 + graphXpadding, graphYpadding, 0 + graphXpadding, height - graphYpadding)
+
+    fill(0, 50, 135);
+    stroke(0, 50, 135);
+
+
+    textAlign(CENTER, TOP);
+    text("TIME", width/2, graphHeight + graphYpadding);
+
+    textAlign(CENTER, BOTTOM);
+    translate(graphXpadding, height/2)
+    rotate(-PI/2);
+    text("VOLUME", 0, 0);
+    rotate(PI/2)
+    translate(-graphXpadding, -height/2)
+
+    //Y axis labels
+    //unit: dBFS
+    textSize(15)
+    textAlign(RIGHT, TOP)
+    text("1", graphXpadding, graphYpadding)
+    textAlign(RIGHT, BOTTOM)
+    text("-12", graphXpadding, height - graphYpadding)
+
+    //X axis labels
+    //unit: years
+    textAlign(LEFT, TOP)
+    text("1928", graphXpadding, height - graphYpadding)
+    textAlign(RIGHT, TOP)
+    text("2009", width - graphXpadding, height - graphYpadding)
+
+
+    textAlign(CENTER, CENTER);
 }
 
 function getData() {
