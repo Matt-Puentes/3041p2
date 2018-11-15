@@ -3,10 +3,19 @@ var vol = 0;
 var fadeLevel = 100;
 var demoState = 0;
 var lastDraw = 0;
-var progressBarPos = 0;
+var progressBarPos;
 var data;
 var notesPlayed = [];
 var yRange = [-13,1];
+var songPlaying = false;
+
+var pink = "#F99FC9"
+var blue = "#ABCAE9"
+
+var graphXpadding;
+var graphYpadding;
+var graphWidth;
+var graphHeight;
 
 function preload() {
     // song = loadSound('Note-Annoying.wav');
@@ -21,6 +30,12 @@ function setup() {
     textSize(40);
     textAlign(CENTER);
     data = getData();
+
+    graphXpadding = 100;
+    graphYpadding = 70;
+    graphWidth = width - (graphXpadding * 2);
+    graphHeight = height - (graphYpadding * 2);
+    progressBarPos = graphXpadding;
 }
 
 function mousePressed() {
@@ -31,7 +46,7 @@ function draw() {
     //This handles the timing for the progress bar
     if(demoState == 1){
         var dt = (millis() - lastDraw)/1000;
-        var pixelsPerSecond = (width/data.length)/1;
+        var pixelsPerSecond = (graphWidth/data.length)/1;
         progressBarPos += pixelsPerSecond * dt;
     }
 
@@ -44,37 +59,47 @@ function draw() {
             demoState = 1;
 
         //Draw text+background
-        background("#9055A2");
-        fill(46, 41, 78, (fadeLevel/100) * 255);
+        background(pink);
+        fill(0, 50, 135, (fadeLevel/100) * 255);
+        stroke(0, 50, 135, (fadeLevel/100) * 255);
         text("Has music been getting louder? Let's see...", width/2, 60);
     }
     //The "Graph Screen"
     else if(demoState == 1){
+        if(!songPlaying){
+            song.play(0,1,1,30,100);
+            songPlaying = true
+        }
         //Draw text+background
-        background("#D499B9");
+        background(pink);
         textAlign(CENTER);
-        fill("#011638");
+        fill(0, 50, 135);
         text("Let's look at the volume of music over 84 years...", width/2, 50);
 
-        //Draw Progress Bar
-        line(progressBarPos, 0, progressBarPos, height);
         //Draw Line Graph
         lineGraph(-13, 1, "Max Loud",data);
+        //Draw Progress Bar
+        stroke(0, 50, 135);
+        line(progressBarPos, graphYpadding, progressBarPos, graphHeight + graphYpadding);
 
         //Calculate the current point based on the progress bar's position
-        var currPoint = Math.floor((progressBarPos/width) * (data.length - 1));
+        var currPoint = Math.floor(((progressBarPos - graphXpadding)/graphWidth) * (data.length - 1));
+        // console.log(currPoint)
+        // console.log(progressBarPos)
+        // console.log(graphXpadding)
+        // console.log(graphWidth)
+        // console.log(((progressBarPos - graphXpadding)/graphWidth))
+        // console.log("---------")
         //If this point hasn't had its note played yet, play it
         if (!(currPoint in notesPlayed)){
             notesPlayed.push(currPoint);
             //Calculate volume based on data
             var volume = ((data[currPoint]["Max Loud"] - yRange[0])/(yRange[1] - yRange[0]));
-            if(currPoint == 0)
-                song.play(0,1,1,30,100);
             var masterVol = ((Math.pow(100,(currPoint/data.length))-1)/75)+.20
             print(masterVol)
             masterVolume(masterVol)
         }
-        if(progressBarPos > width){
+        if(progressBarPos > graphWidth+graphXpadding){
             demoState = 2;
         }
     }
@@ -85,33 +110,36 @@ function draw() {
             fadeLevel += 1;
 
         //Draw text+background
-        background("#9055A2");
-        fill(46, 41, 78, (fadeLevel/100) * 255);
+        background(pink);
+        fill(0, 50, 135, (fadeLevel/100) * 255);
+        stroke(0, 50, 135, (fadeLevel/100) * 255);
         text("See how terrible music has become?\nYou can help by texting 1-800-STOPPOP.", width/2, 60);
     }
     lastDraw = millis();
 }
 
 function lineGraph(minY, maxY, yKey, points){
-    var graphWidth = width;
-    var graphHeight = height;
+    stroke(0, 0, 0);
     var range = maxY-minY;
     var oldP = [NaN,NaN];
     for (point in points){
-        var x = graphWidth*(point/(points.length - 1));
-        var y = (((points[point][yKey] - minY)/range) * -height) + height;
+        var x = graphWidth*(point/(points.length - 1)) + graphXpadding;
+        var y = (((points[point][yKey] - minY)/range) * - graphHeight) + graphHeight + graphYpadding;
         var newP = [x,y]
         //draw the lines
         if(!isNaN(oldP[0])){
-            fill("#011638");
+            fill(0, 50, 135);
             line(newP[0],newP[1],oldP[0],oldP[1])
         }
         //draw the points
-        fill(46, 41, 78);
+        //fill(46, 41, 78);
+        fill(0, 50, 135)
         ellipse(newP[0], newP[1], 5, 5);
 
         var oldP = [x,y]
     }
+    line(graphXpadding, graphHeight + graphYpadding, width - graphXpadding, graphHeight + graphYpadding)
+    line(0 + graphXpadding, graphYpadding, 0 + graphXpadding, height - graphYpadding)
 }
 
 function getData() {
